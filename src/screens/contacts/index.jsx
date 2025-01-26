@@ -1,7 +1,9 @@
-import {View, Text, FlatList} from 'react-native';
+import {View, Text, FlatList, TouchableOpacity} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import SQLite from 'react-native-sqlite-storage';
 import {defaultScreenStyle} from '../../styles/defaultScreenStyle';
+import {Add} from 'iconsax-react-native';
+import ContactItem from '../../components/contacts/contactItem';
 
 const db = SQLite.openDatabase({
   name: 'ContactsDatabase',
@@ -25,14 +27,31 @@ const Contacts = () => {
       txn.executeSql(
         'SELECT * FROM users',
         [],
-        (sqlTxn, res) => {
-          console.log('gelen veriler', res.rows);
+        (sqlTxn, response) => {
+          if (response.rows.length > 0) {
+            let users = [];
+            for (let i = 0; i < response.rows.length; i++) {
+              let item = response.rows.item(i);
+              users.push(item);
+            }
+            setUsers(users);
+          }
         },
         error => console.log('hata', error.message),
       );
     });
   };
+  const addNewContact = (name, surname, phone, email, address, job) => {
+    db.transaction(txn => {
+      txn.executeSql(
+        'INSERT INTO users(name,surname,phone,email,address,job) VALUES (?,?,?,?,?,?)',
+        [name, surname, phone, email, address, job],
+        (sqlTxn, response) => console.log('kisi eklendi'),
 
+        error => console.log('hata', error.message),
+      );
+    });
+  };
   useEffect(() => {
     createContactsTable();
     getContacts();
@@ -42,8 +61,31 @@ const Contacts = () => {
     <View style={defaultScreenStyle.container}>
       <FlatList
         data={users}
-        renderItem={({item}) => <Text>{item.name}</Text>}
+        keyExtractor={(item, index) => item.id.toString()}
+        renderItem={({item}) => <ContactItem item={item} />}
       />
+
+      <TouchableOpacity
+        onPress={() =>
+          addNewContact(
+            'Meryem',
+            'Uludagli',
+            '075567675',
+            'meryemuludagli@gmail.com',
+            'Cyprus',
+            'Software Developer',
+          )
+        }
+        style={{
+          position: 'absolute',
+          right: 20,
+          bottom: 20,
+          backgroundColor: 'gray',
+          padding: 20,
+          borderRadius: 100,
+        }}>
+        <Add name="add" size={30} color="black" />
+      </TouchableOpacity>
     </View>
   );
 };
