@@ -7,8 +7,9 @@ import {Colors} from '../../theme/colors';
 import CircleIconButton from '../../components/ui/circleIconButton';
 import {Call, Messages3, Sms} from 'iconsax-react-native';
 import {defaultScreenStyle} from '../../styles/defaultScreenStyle';
+import {CALLING} from '../../utils/routes';
 
-const ContactDetail = ({route}) => {
+const ContactDetail = ({route, navigation}) => {
   const {contact} = route.params;
   return (
     <View style={defaultScreenStyle.container}>
@@ -35,6 +36,7 @@ const ContactDetail = ({route}) => {
             icon={<Messages3 size="32" color="#FFF" variant="Bold" />}
           />
           <CircleIconButton
+            onPress={() => navigation.navigate(CALLING, {contact: contact})}
             color={Colors.BLUE}
             icon={<Call size="32" color="#FFF" variant="Bold" />}
           />
