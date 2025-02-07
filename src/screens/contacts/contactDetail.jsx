@@ -1,16 +1,40 @@
 import {ScrollView, StyleSheet, Text, View} from 'react-native';
 import React from 'react';
+
 import Avatar from '../../components/contacts/avatar';
 import {convertFullName} from '../../utils/functions';
 import {height, sizes} from '../../utils/constants';
 import {Colors} from '../../theme/colors';
 import CircleIconButton from '../../components/ui/circleIconButton';
 import {Call, Messages3, Sms} from 'iconsax-react-native';
+import {CALLING} from './../../utils/routes';
+import SQLite from 'react-native-sqlite-storage';
 import {defaultScreenStyle} from '../../styles/defaultScreenStyle';
-import {CALLING} from '../../utils/routes';
+
+const db = SQLite.openDatabase({
+  name: 'ContactsDatabase',
+});
 
 const ContactDetail = ({route, navigation}) => {
   const {contact} = route.params;
+  const addNewCall = (date, resent_id) => {
+    db.transaction(txn => {
+      txn.executeSql(
+        'INSERT INTO resents (date,resent_id) VALUES (?,?)',
+        [date, resent_id],
+        (sqlTxn, response) => console.log('arama eklendi'),
+
+        error => console.log('hata', error.message),
+      );
+    });
+  };
+  const handleCall = () => {
+    const now = new Date();
+    const date = now.toDateString();
+    addNewCall(date, contact.id);
+    navigation.navigate(CALLING, {contact: contact});
+  };
+
   return (
     <View style={defaultScreenStyle.container}>
       <ScrollView>
@@ -36,7 +60,7 @@ const ContactDetail = ({route, navigation}) => {
             icon={<Messages3 size="32" color="#FFF" variant="Bold" />}
           />
           <CircleIconButton
-            onPress={() => navigation.navigate(CALLING, {contact: contact})}
+            onPress={() => handleCall()}
             color={Colors.BLUE}
             icon={<Call size="32" color="#FFF" variant="Bold" />}
           />
@@ -65,7 +89,7 @@ const ContactDetail = ({route, navigation}) => {
 
           <View style={styles.infoContainer}>
             <Text style={styles.infoTitle}>Adress</Text>
-            <Text style={styles.info}>{contact.adress}</Text>
+            <Text style={styles.info}>{contact?.adress}</Text>
           </View>
 
           <View style={styles.infoContainer}>

@@ -11,12 +11,24 @@ const db = SQLite.openDatabase({
 
 const Contacts = () => {
   const [users, setUsers] = useState([]);
+
   const createContactsTable = () => {
     db.transaction(txn => {
       txn.executeSql(
         'CREATE Table IF NOT EXISTS users(id INTEGER PRIMARY KEY AUTOINCREMENT, name VARCHAR(100), surname VARCHAR(100), phone INTEGER, email VARCHAR(500), address VARSHAR(1000), job VARCHAR(100))',
         [],
         (sqlTxn, res) => console.log('tablo oluştu'),
+        error => console.log('hata', error.message),
+      );
+    });
+  };
+
+  const createResentsTable = () => {
+    db.transaction(txn => {
+      txn.executeSql(
+        'CREATE Table IF NOT EXISTS resents(id INTEGER PRIMARY KEY AUTOINCREMENT, date VARCHAR(100), resent_id INTEGER)',
+        [],
+        (sqlTxn, res) => console.log('Resent tablo oluştu'),
         error => console.log('hata', error.message),
       );
     });
@@ -54,6 +66,7 @@ const Contacts = () => {
   };
   useEffect(() => {
     createContactsTable();
+    createResentsTable();
     getContacts();
   }, []);
 
