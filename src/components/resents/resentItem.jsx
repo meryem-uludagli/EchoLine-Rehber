@@ -5,33 +5,35 @@ import {Colors} from '../../theme/colors';
 import Avatar from '../contacts/avatar';
 import {convertFullName} from '../../utils/functions';
 import {sizes} from '../../utils/constants';
+
 const db = SQLite.openDatabase({
   name: 'ContactsDatabase',
 });
 
 const ResentItem = ({item}) => {
-  const [user, setUser] = useState();
+  const [user, setUser] = useState(null);
+
   const getUser = () => {
     db.transaction(txn => {
       txn.executeSql(
-        `SELECT * FROM users WHERE id=${item.resent_id}`,
-        [],
+        `SELECT * FROM users WHERE id=?`, // Güvenli sorgu için '?' kullandık
+        [item.resent_id], // Parametre olarak gönderdik
         (sqlTxn, response) => {
+          console.log('Rows length:', response.rows.length);
           if (response.rows.length > 0) {
-            for (let i = 0; i < response.rows.length; i++) {
-              let item = response.rows.item(i);
-              setUser(item);
-            }
+            let userData = response.rows.item(0); // İlk kullanıcıyı al
+            setUser(userData);
           }
         },
-        error => console.log('hata', error.message),
+        error => console.log('Hata:', error.message),
       );
     });
   };
+
   useEffect(() => {
     getUser();
-    console.log(response.rows.length);
-  }, []);
+  }, []); // useEffect içinde `response` kullanımı kaldırıldı.
+
   return (
     <Pressable style={styles.container}>
       <View style={styles.avatarContainer}>
@@ -48,9 +50,9 @@ const ResentItem = ({item}) => {
 
       <View style={styles.infoContainer}>
         <Text style={styles.name}>
-          {user ? convertFullName(user?.name, user?.surname) : null}
+          {user ? convertFullName(user.name, user.surname) : 'Bilinmiyor'}
         </Text>
-        <Text style={styles.job}>{user?.phone}</Text>
+        <Text style={styles.job}>{user?.phone ?? 'Telefon yok'}</Text>
       </View>
     </Pressable>
   );
