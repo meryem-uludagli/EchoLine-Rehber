@@ -1,7 +1,7 @@
 import {View, Text, FlatList} from 'react-native';
+import {defaultScreenStyle} from '../../styles/defaultScreenStyle';
 import SQLite from 'react-native-sqlite-storage';
 import {useState, useEffect} from 'react';
-import {defaultScreenStyle} from '../../styles/defaultScreenStyle';
 import ResentItem from '../../components/resents/resentItem';
 const db = SQLite.openDatabase({
   name: 'ContactsDatabase',
@@ -11,7 +11,7 @@ const Resents = () => {
   const getResents = () => {
     db.transaction(txn => {
       txn.executeSql(
-        'SELECT * FROM resents',
+        'SELECT * FROM calls',
         [],
         (sqlTxn, response) => {
           if (response.rows.length > 0) {

@@ -1,9 +1,9 @@
 import {View, Text, FlatList, TouchableOpacity} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import SQLite from 'react-native-sqlite-storage';
-import {defaultScreenStyle} from '../../styles/defaultScreenStyle';
 import {Add} from 'iconsax-react-native';
 import ContactItem from '../../components/contacts/contactItem';
+import {defaultScreenStyle} from '../../styles/defaultScreenStyle';
 
 const db = SQLite.openDatabase({
   name: 'ContactsDatabase',
@@ -11,7 +11,6 @@ const db = SQLite.openDatabase({
 
 const Contacts = () => {
   const [users, setUsers] = useState([]);
-
   const createContactsTable = () => {
     db.transaction(txn => {
       txn.executeSql(
@@ -22,13 +21,12 @@ const Contacts = () => {
       );
     });
   };
-
   const createResentsTable = () => {
     db.transaction(txn => {
       txn.executeSql(
-        'CREATE Table IF NOT EXISTS resents(id INTEGER PRIMARY KEY AUTOINCREMENT, date VARCHAR(100), resent_id INTEGER)',
+        'CREATE Table IF NOT EXISTS calls (id INTEGER PRIMARY KEY AUTOINCREMENT, date VARCHAR(100), resent_id INTEGER, callType VARCHAR(100))',
         [],
-        (sqlTxn, res) => console.log('Resent tablo oluştu'),
+        (sqlTxn, res) => console.log('Call tablo oluştu'),
         error => console.log('hata', error.message),
       );
     });
@@ -74,10 +72,8 @@ const Contacts = () => {
     <View style={defaultScreenStyle.container}>
       <FlatList
         data={users}
-        keyExtractor={(item, index) => item.id.toString()}
         renderItem={({item}) => <ContactItem item={item} />}
       />
-
       <TouchableOpacity
         onPress={() =>
           addNewContact(
@@ -93,7 +89,7 @@ const Contacts = () => {
           position: 'absolute',
           right: 20,
           bottom: 20,
-          backgroundColor: 'gray',
+          backgroundColor: 'white',
           padding: 20,
           borderRadius: 100,
         }}>

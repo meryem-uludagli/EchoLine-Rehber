@@ -1,7 +1,5 @@
 import {ScrollView, StyleSheet, Text, View} from 'react-native';
 import React from 'react';
-
-import Avatar from '../../components/contacts/avatar';
 import {convertFullName} from '../../utils/functions';
 import {height, sizes} from '../../utils/constants';
 import {Colors} from '../../theme/colors';
@@ -9,6 +7,7 @@ import CircleIconButton from '../../components/ui/circleIconButton';
 import {Call, Messages3, Sms} from 'iconsax-react-native';
 import {CALLING} from './../../utils/routes';
 import SQLite from 'react-native-sqlite-storage';
+import Avatar from '../../components/contacts/avatar';
 import {defaultScreenStyle} from '../../styles/defaultScreenStyle';
 
 const db = SQLite.openDatabase({
@@ -17,11 +16,11 @@ const db = SQLite.openDatabase({
 
 const ContactDetail = ({route, navigation}) => {
   const {contact} = route.params;
-  const addNewCall = (date, resent_id) => {
+  const addNewCall = (date, resent_id, callType) => {
     db.transaction(txn => {
       txn.executeSql(
-        'INSERT INTO resents (date,resent_id) VALUES (?,?)',
-        [date, resent_id],
+        'INSERT INTO calls (date,resent_id,callType) VALUES (?,?,?)',
+        [date, resent_id, callType],
         (sqlTxn, response) => console.log('arama eklendi'),
 
         error => console.log('hata', error.message),
@@ -31,7 +30,7 @@ const ContactDetail = ({route, navigation}) => {
   const handleCall = () => {
     const now = new Date();
     const date = now.toDateString();
-    addNewCall(date, contact.id);
+    addNewCall(date, contact.id, 'outcoming');
     navigation.navigate(CALLING, {contact: contact});
   };
 
@@ -56,7 +55,7 @@ const ContactDetail = ({route, navigation}) => {
             icon={<Sms size="32" color="#FFF" variant="Bold" />}
           />
           <CircleIconButton
-            color={Colors.PURPLE}
+            color={Colors.PURPEL}
             icon={<Messages3 size="32" color="#FFF" variant="Bold" />}
           />
           <CircleIconButton
@@ -142,6 +141,5 @@ const styles = StyleSheet.create({
     color: Colors.BLACK,
     fontSize: 16,
     marginTop: 5,
-    fontWeight: '600',
   },
 });

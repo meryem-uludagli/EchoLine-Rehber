@@ -1,4 +1,4 @@
-import {Pressable, StyleSheet, Text, View} from 'react-native';
+import {View, Text, StyleSheet, Pressable} from 'react-native';
 import React from 'react';
 import {convertFullName} from '../../utils/functions';
 import {Colors} from '../../theme/colors';
@@ -9,6 +9,7 @@ import {sizes} from '../../utils/constants';
 
 const ContactItem = ({item}) => {
   const navigation = useNavigation();
+
   return (
     <Pressable
       onPress={() => navigation.navigate(CONTACTDETAIL, {contact: item})}
@@ -16,6 +17,7 @@ const ContactItem = ({item}) => {
       <View style={styles.avatarContainer}>
         <Avatar name={item.name} surname={item.surname} size={sizes.SMALL} />
       </View>
+
       <View style={styles.infoContainer}>
         <Text style={styles.name}>
           {convertFullName(item.name, item.surname)}
@@ -39,7 +41,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '700',
     margin: 5,
-    color: Colors.BLACK,
+    color: Colors.WHITE,
   },
   job: {
     fontSize: 14,

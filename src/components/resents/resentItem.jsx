@@ -2,9 +2,10 @@ import {StyleSheet, Text, View, Pressable} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import SQLite from 'react-native-sqlite-storage';
 import {Colors} from '../../theme/colors';
-import Avatar from '../contacts/avatar';
 import {convertFullName} from '../../utils/functions';
 import {sizes} from '../../utils/constants';
+import {CallIncoming, CallOutgoing} from 'iconsax-react-native';
+import Avatar from '../contacts/avatar';
 
 const db = SQLite.openDatabase({
   name: 'ContactsDatabase',
@@ -16,12 +17,12 @@ const ResentItem = ({item}) => {
   const getUser = () => {
     db.transaction(txn => {
       txn.executeSql(
-        `SELECT * FROM users WHERE id=?`, // Güvenli sorgu için '?' kullandık
-        [item.resent_id], // Parametre olarak gönderdik
+        `SELECT * FROM users WHERE id=?`,
+        [item.resent_id],
         (sqlTxn, response) => {
           console.log('Rows length:', response.rows.length);
           if (response.rows.length > 0) {
-            let userData = response.rows.item(0); // İlk kullanıcıyı al
+            let userData = response.rows.item(0);
             setUser(userData);
           }
         },
@@ -32,19 +33,17 @@ const ResentItem = ({item}) => {
 
   useEffect(() => {
     getUser();
-  }, []); // useEffect içinde `response` kullanımı kaldırıldı.
+  }, []);
 
   return (
     <Pressable style={styles.container}>
       <View style={styles.avatarContainer}>
-        {user ? (
+        {user && (
           <Avatar
             name={user.name ?? ''}
             surname={user.surname ?? ''}
             size={sizes.SMALL}
           />
-        ) : (
-          <Text>Loading...</Text>
         )}
       </View>
 
@@ -52,7 +51,15 @@ const ResentItem = ({item}) => {
         <Text style={styles.name}>
           {user ? convertFullName(user.name, user.surname) : 'Bilinmiyor'}
         </Text>
-        <Text style={styles.job}>{user?.phone ?? 'Telefon yok'}</Text>
+        <Text style={styles.job}>{item?.date}</Text>
+      </View>
+
+      <View style={styles.callTypeContainer}>
+        {item?.callType == 'incoming' ? (
+          <CallIncoming name="add" size={28} color={Colors.RED} />
+        ) : (
+          <CallOutgoing name="add" size={28} color={Colors.GREEN} />
+        )}
       </View>
     </Pressable>
   );
@@ -71,7 +78,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '700',
     margin: 5,
-    color: Colors.WHITE,
+    color: Colors.BLACK,
   },
   job: {
     fontSize: 14,
@@ -85,5 +92,8 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  callTypeContainer: {
+    marginHorizontal: 10,
   },
 });
