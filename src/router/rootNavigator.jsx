@@ -4,6 +4,7 @@ import {
   CALLING,
   CONTACTDETAIL,
   TABNAVIGATOR,
+  UPDATECONTACT,
 } from '../utils/routes';
 import TabNavigator from './tabNavigator';
 import ContactDetail from '../screens/contacts/contactDetail';
@@ -14,6 +15,7 @@ import {Pressable, View} from 'react-native';
 import {Edit, Trash} from 'iconsax-react-native';
 import {useDispatch} from 'react-redux';
 import {deleteContact} from '../store/actions/contactAction';
+import UpdateContact from '../screens/contacts/updateContact';
 
 const Stack = createNativeStackNavigator();
 
@@ -40,7 +42,11 @@ export default function RootNavigator() {
                 <Trash name="trash" color={Colors.RED} size={25} />
               </Pressable>
               <Pressable
-                onPress={() => navigation.navigate(ADDNEWCONTACT)}
+                onPress={() =>
+                  navigation.navigate(UPDATECONTACT, {
+                    contact: route.params.contact,
+                  })
+                }
                 style={{marginRight: 5}}>
                 <Edit name="edit" color={Colors.BLUE} size={25} />
               </Pressable>
@@ -56,6 +62,7 @@ export default function RootNavigator() {
         component={Calling}
       />
       <Stack.Screen name={ADDNEWCONTACT} component={AddContact} />
+      <Stack.Screen name={UPDATECONTACT} component={UpdateContact} />
     </Stack.Navigator>
   );
 }
