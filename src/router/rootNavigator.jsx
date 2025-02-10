@@ -10,10 +10,15 @@ import ContactDetail from '../screens/contacts/contactDetail';
 import {Colors} from '../theme/colors';
 import Calling from '../screens/calling';
 import AddContact from '../screens/contacts/addContact';
+import {Pressable, View} from 'react-native';
+import {Edit, Trash} from 'iconsax-react-native';
+import {useDispatch} from 'react-redux';
+import {deleteContact} from '../store/actions/contactAction';
 
 const Stack = createNativeStackNavigator();
 
 export default function RootNavigator() {
+  const dispatch = useDispatch();
   return (
     <Stack.Navigator
       screenOptions={{
@@ -25,7 +30,26 @@ export default function RootNavigator() {
         name={TABNAVIGATOR}
         component={TabNavigator}
       />
-      <Stack.Screen name={CONTACTDETAIL} component={ContactDetail} />
+      <Stack.Screen
+        options={({navigation, route}) => ({
+          headerRight: () => (
+            <View style={{flexDirection: 'row'}}>
+              <Pressable
+                onPress={() => dispatch(deleteContact(route.params.contact.id))}
+                style={{marginRight: 10}}>
+                <Trash name="trash" color={Colors.RED} size={25} />
+              </Pressable>
+              <Pressable
+                onPress={() => navigation.navigate(ADDNEWCONTACT)}
+                style={{marginRight: 5}}>
+                <Edit name="edit" color={Colors.BLUE} size={25} />
+              </Pressable>
+            </View>
+          ),
+        })}
+        name={CONTACTDETAIL}
+        component={ContactDetail}
+      />
       <Stack.Screen
         options={{headerShown: false}}
         name={CALLING}

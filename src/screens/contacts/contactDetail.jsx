@@ -1,5 +1,5 @@
 import {ScrollView, StyleSheet, Text, View} from 'react-native';
-import React from 'react';
+import React, {useEffect} from 'react';
 import {convertFullName} from '../../utils/functions';
 import {height, sizes} from '../../utils/constants';
 import {Colors} from '../../theme/colors';
@@ -9,12 +9,15 @@ import {CALLING} from './../../utils/routes';
 import SQLite from 'react-native-sqlite-storage';
 import Avatar from '../../components/contacts/avatar';
 import {defaultScreenStyle} from '../../styles/defaultScreenStyle';
+import {setContacts, setPending} from '../../store/slice/contactSlice';
+import {useDispatch} from 'react-redux';
 
 const db = SQLite.openDatabase({
   name: 'ContactsDatabase',
 });
 
 const ContactDetail = ({route, navigation}) => {
+  const dispatch = useDispatch();
   const {contact} = route.params;
   const addNewCall = (date, resent_id, callType) => {
     db.transaction(txn => {
@@ -33,7 +36,33 @@ const ContactDetail = ({route, navigation}) => {
     addNewCall(date, contact.id, 'outcoming');
     navigation.navigate(CALLING, {contact: contact});
   };
-
+  const getContacts = () => {
+    dispatch(setPending(true));
+    db.transaction(txn => {
+      txn.executeSql(
+        'SELECT * FROM users',
+        [],
+        (sqlTxn, response) => {
+          if (response.rows.length > 0) {
+            let users = [];
+            for (let i = 0; i < response.rows.length; i++) {
+              let item = response.rows.item(i);
+              users.push(item);
+            }
+            dispatch(setContacts(users));
+          }
+          dispatch(setPending(false));
+        },
+        error => console.log('hata', error.message),
+        dispatch(setContacts(false)),
+      );
+    });
+  };
+  useEffect(() => {
+    return () => {
+      getContacts();
+    };
+  }, []);
   return (
     <View style={defaultScreenStyle.container}>
       <ScrollView>

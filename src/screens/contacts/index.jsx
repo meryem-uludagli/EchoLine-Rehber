@@ -1,13 +1,6 @@
-import {
-  View,
-  Text,
-  FlatList,
-  TouchableOpacity,
-  ActivityIndicator,
-} from 'react-native';
+import {View, Text, FlatList, ActivityIndicator} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import SQLite from 'react-native-sqlite-storage';
-import {Add} from 'iconsax-react-native';
 import ContactItem from '../../components/contacts/contactItem';
 import {defaultScreenStyle} from '../../styles/defaultScreenStyle';
 import {useDispatch, useSelector} from 'react-redux';
@@ -59,6 +52,7 @@ const Contacts = () => {
             }
             dispatch(setContacts(users));
           }
+          dispatch(setPending(false));
         },
         error => console.log('hata', error.message),
         dispatch(setPending(false)),

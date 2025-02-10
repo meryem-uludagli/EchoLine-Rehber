@@ -13,6 +13,7 @@ const Tab = createBottomTabNavigator();
 export default function TabNavigator() {
   return (
     <Tab.Navigator
+      initialRouteName={CONTACTS}
       screenOptions={({route}) => ({
         tabBarIcon: ({focused, size, color}) => (
           <TabBarIcon name={route.name} color={color} size={size} />

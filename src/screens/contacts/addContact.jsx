@@ -1,14 +1,38 @@
 import {ScrollView, StyleSheet, View} from 'react-native';
-import React from 'react';
+import React, {useEffect} from 'react';
 import {Formik} from 'formik';
 import SQLite from 'react-native-sqlite-storage';
 import {Input, Button} from '@ui-kitten/components';
 import {defaultScreenStyle} from '../../styles/defaultScreenStyle';
 import {newContactSchema} from '../../utils/schemas';
+import {useDispatch, useSelector} from 'react-redux';
+import {setContacts, setPending} from '../../store/slice/contactSlice';
 const db = SQLite.openDatabase({
   name: 'ContactsDatabase',
 });
 const AddContact = () => {
+  const dispatch = useDispatch();
+  const getContacts = () => {
+    dispatch(setPending(true));
+    db.transaction(txn => {
+      txn.executeSql(
+        'SELECT * FROM users',
+        [],
+        (sqlTxn, response) => {
+          if (response.rows.length > 0) {
+            let users = [];
+            for (let i = 0; i < response.rows.length; i++) {
+              let item = response.rows.item(i);
+              users.push(item);
+            }
+            dispatch(setContacts(users));
+          }
+        },
+        error => console.log('hata', error.message),
+        dispatch(setPending(false)),
+      );
+    });
+  };
   const addNewContact = values => {
     db.transaction(txn => {
       txn.executeSql(
@@ -27,17 +51,22 @@ const AddContact = () => {
       );
     });
   };
+  useEffect(() => {
+    return () => {
+      getContacts();
+    };
+  }, []);
   return (
     <View style={defaultScreenStyle.container}>
       <ScrollView>
         <Formik
           initialValues={{
-            name: 'Meryem',
-            surname: 'Uludagli',
-            email: 'mery56872@gmail.com',
-            phone: '5678909876',
-            address: 'Cyprus',
-            job: 'Software Developer',
+            name: '',
+            surname: '',
+            email: '',
+            phone: '',
+            address: '',
+            job: '',
           }}
           validationSchema={newContactSchema}
           onSubmit={values => addNewContact(values)}>
